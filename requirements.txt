@@ -5,3 +5,4 @@ requests
 scikit-learn
 tensorflow
 psycopg2-binary # for PostgreSQL
+fastapi
