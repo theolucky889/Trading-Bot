@@ -1,13 +1,200 @@
 <!DOCTYPE html>
-<html lang="">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Algorithmic Trading Dashboard</title>
+  <link rel="icon" href="icon(change later)">
+
+  <!-- Tailwind CSS -->
+   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+  <!-- custom CSS styles -->
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* Custom styling for transitions will seperate into index.css file later*/
+    body {
+      background-color: #1e1e2f;
+      color: #f1f1f1;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .btn {
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #4CAF50;
+    }
+
+    .card-body {
+      background-color: #2a2a3d;
+      border-radius: 10px;
+      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Apply for futuristic button styles */
+    .btn-futuristic {
+      background-color: #4e73df;
+      border: 1px solid #4e73df;
+      color: #fff;
+      border-radius: 50px;
+      padding: 12px 30px;
+      font-weight: bold;
+      text-transform: uppercase;
+      transition: all 0.3s;
+    }
+
+    .btn-futuristic:hover {
+      background-color: transparent;
+      color: #4e73df;
+      border-color: #4e73df;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand text-2xl font-bold text-[#4e73df]" href="#">TradingBot Dashboard</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" href="#">Settings</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Dashboard Section -->
+    <div class="container mx-auto mt-8 px-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Real-Time Trading Data -->
+        <div class="col-span-1">
+          <div class="card shadow-lg rounded-lg overflow-hidden">
+            <div class="card-body p-6">
+              <h2 class="text-xl font-semibold text-[#4e73df] mb-4">Real-Time Trading Data</h2>
+              <div id="binance-data" class="text-lg text-gray-300">Loading data...</div>
+              <button class="btn btn-futuristic mt-4" id="refresh-btn">Refresh Data</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bot Status Section -->
+        <div class="col-span-1">
+          <div class="card shadow-lg rounded-lg overflow-hidden">
+            <div class="card-body p-6">
+              <h2 class="text-xl font-semibold text-[#4e73df] mb-4">Trading Bot Status</h2>
+              <div class="text-lg mb-4" id="bot-status">Bot is running...</div>
+              <button class="btn btn-futuristic mt-2" id="start-btn">Start Bot</button>
+              <button class="btn btn-futuristic mt-2" id="stop-btn">Stop Bot</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Section -->
+      <div class="mt-8">
+        <div class="card shadow-lg rounded-lg overflow-hidden">
+          <div class="card-body p-6">
+            <h2 class="text-xl font-semibold text-[#4e73df] mb-4">API Settings</h2>
+            <div class="mb-4">
+              <label for="api-key" class="block text-sm text-gray-400">API Key</label>
+              <input type="text" id="api-key" class="w-full p-2 rounded-md bg-gray-800 text-gray-300 border-2 border-gray-600" placeholder="Enter API Key">
+            </div>
+            <div class="mb-4">
+              <label for="api-secret" class="block text-sm text-gray-400">API Secret</label>
+              <input type="text" id="api-secret" class="w-full p-2 rounded-md bg-gray-800 text-gray-300 border-2 border-gray-600" placeholder="Enter API Secret">
+            </div>
+            <button class="btn btn-futuristic mt-4" id="save-settings">Save Settings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vue.js and Axios for data handling -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.2.31/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.27.2/dist/axios.min.js"></script>
+
+  <script>
+    const app = Vue.createApp({
+      data() {
+        return {
+          binanceData: null,
+          botStatus: "Bot is running..."
+        };
+      },
+      mounted() {
+        this.fetchBinanceData();
+      },
+      methods: {
+        fetchBinanceData() {
+          // Simulate Binance API data (replace with actual API endpoint)
+          axios.get('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT')
+            .then(response => {
+              this.binanceData = response.data;
+              document.getElementById('binance-data').innerHTML = `BTC Price: $${this.binanceData.lastPrice}`;
+            })
+            .catch(error => {
+              console.error("Error fetching Binance data:", error);
+            });
+        },
+        toggleBotStatus() {
+          if (this.botStatus === "Bot is running...") {
+            this.botStatus = "Bot is stopped.";
+            document.getElementById('bot-status').innerText = this.botStatus;
+          } else {
+            this.botStatus = "Bot is running...";
+            document.getElementById('bot-status').innerText = this.botStatus;
+          }
+        }
+      }
+    });
+
+    app.mount("#app");
+
+    // Button event listeners for start/stop bot
+    document.getElementById('start-btn').addEventListener('click', () => {
+      app.toggleBotStatus();
+    });
+
+    document.getElementById('stop-btn').addEventListener('click', () => {
+      app.toggleBotStatus();
+    });
+
+    // Saving API settings
+    document.getElementById('save-settings').addEventListener('click', () => {
+      const apiKey = document.getElementById('api-key').value;
+      const apiSecret = document.getElementById('api-secret').value;
+      alert(`Settings saved for API Key: ${apiKey} and API Secret: ${apiSecret}`);
+    });
+
+    // Refresh data button
+    document.getElementById('refresh-btn').addEventListener('click', () => {
+      app.fetchBinanceData();
+    });
+  </script>
+</body>
+
 </html>
