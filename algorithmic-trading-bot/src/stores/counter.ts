@@ -1,12 +1,13 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useCounterStore = defineStore('counter', () => {
-  const count = ref(0)
-  const doubleCount = computed(() => count.value * 2)
-  function increment() {
-    count.value++
-  }
-
-  return { count, doubleCount, increment }
+export const useCounterStore = defineStore('trading', {
+  state: () => ({
+    stockPrices: {} as Record<string, number>, // Ex. BTC: 50000, AAPL: 175
+  }),
+  actions: {
+    setPrice(symbol: string, price: number) {
+      this.stockPrices[symbol] = price
+    },
+  },
 })
