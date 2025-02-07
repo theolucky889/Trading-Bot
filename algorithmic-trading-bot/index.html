@@ -27,8 +27,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" href="#">Home</a></li>
-            <li class="nav-item"><a class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" href="#">Settings</a></li>
+            <li class="nav-item"><router-link class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" to="/HomeView">Home</router-link></li>
+            <li class="nav-item"><a class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" to="/AuthView.vue">Auth</a></li>
+            <li class="nav-item"><a class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" to="/DashboardView">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" to="/SettingsView">Settings</a></li>
           </ul>
         </div>
       </div>
