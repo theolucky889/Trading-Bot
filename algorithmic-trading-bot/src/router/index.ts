@@ -1,12 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Dashboard from './Dashboard.vue';
-import Settings from '@/pages/Settings.vue';
+import HomeView from '../views/HomeView.vue';
+import AuthView from '../views/AuthView.vue';
+import DashboardView from '../views/DashboardView.vue';
+import AboutView from '../views/AboutView.vue';
+import SettingsView from '../views/SettingsView.vue';
 
 const routes = [
-  { path: '/', component: Dashboard},
-  { path:'/settings', component: Settings },
-  // Add more routes here in the futues
-
+  { path: '/', name: 'home', component: HomeView },
+  { path: '/auth', name: 'auth', component: AuthView },
+  { path: '/dashboard', name: 'dashboard', component: DashboardView },
+  { path: '/about', name: 'about', component: AboutView },
+  { path: '/settings', name: 'settings', component: SettingsView }
 ];
 
 const router = createRouter({
