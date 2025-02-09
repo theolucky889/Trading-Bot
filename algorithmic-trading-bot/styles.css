@@ -1,7 +1,6 @@
-/* General Styles */
+/* Add custom styles to prevent navbar overlap */
 body {
-    background-color: #1e1e2f;
-    color: #f1f1f1;
+    padding-top: 80px; /* Adjust this value based on the height of the navbar */
     font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
@@ -79,4 +78,3 @@ body {
       gap: 20px;
     }
   }
-  
