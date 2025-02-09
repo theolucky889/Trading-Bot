@@ -7,64 +7,23 @@
   <title>Algorithmic Trading Dashboard</title>
   <link rel="icon" href="icon.png">
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS (or you can import in your App.vue or a main stylesheet) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- FontAwesome for Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
-  <!-- Custom CSS styles -->
+  <!-- Custom CSS styles (optional, but you can include here) -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="app">
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container-fluid">
-        <a class="navbar-brand text-2xl font-bold text-[#4e73df]" href="#">TradingBot Dashboard</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><router-link class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" to="/HomeView">Home</router-link></li>
-            <li class="nav-item"><a class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" to="/AuthView.vue">Auth</a></li>
-            <li class="nav-item"><a class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" to="/DashboardView">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link text-lg text-gray-400 hover:text-[#4e73df]" to="/SettingsView">Settings</a></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    
-    <!-- Main Dashboard Section -->
-    <div class="container mx-auto mt-8 px-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="col-span-1">
-          <div class="card shadow-lg rounded-lg overflow-hidden">
-            <div class="card-body p-6">
-              <h2 class="text-xl font-semibold text-[#4e73df] mb-4">Real-Time Trading Data</h2>
-              <div id="binance-data" class="text-lg text-gray-300">Loading data...</div>
-              <button class="btn btn-futuristic mt-4" id="refresh-btn">Refresh Data</button>
-            </div>
-          </div>
-        </div>
-        <div class="col-span-1">
-          <div class="card shadow-lg rounded-lg overflow-hidden">
-            <div class="card-body p-6">
-              <h2 class="text-xl font-semibold text-[#4e73df] mb-4">Trading Bot Status</h2>
-              <div class="text-lg mb-4" id="bot-status">Bot is running...</div>
-              <button class="btn btn-futuristic mt-2" id="start-btn">Start Bot</button>
-              <button class="btn btn-futuristic mt-2" id="stop-btn">Stop Bot</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- This is where Vue will mount the app -->
+  <div id="app"></div>
 
-  <!-- JavaScript Files -->
+  <!-- Vue.js and other script files -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3.2.31/dist/vue.global.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios@0.27.2/dist/axios.min.js"></script>
-  <script src="script.js"></script>
+  <!-- Your main JavaScript file (usually bundled) -->
+  <script type="module" src="src/main.ts"></script>  <!-- Or use a Vue CLI's built path -->
 </body>
 </html>
