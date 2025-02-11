@@ -78,3 +78,9 @@ body {
       gap: 20px;
     }
   }
+
+
+  .tooltip {
+    z-index: 9999 !important;
+  }
+  
