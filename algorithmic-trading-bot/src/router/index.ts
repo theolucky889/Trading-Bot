@@ -3,12 +3,14 @@ import HomeView from '../views/HomeView.vue'
 import AuthView from '../views/AuthView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import SettingsView from '../views/SettingsView.vue'
+import TradeView from '../views/TradeView.vue'
 
 const routes = [
   { path: '/', component: HomeView },
   { path: '/auth', component: AuthView },
   { path: '/dashboard', component: DashboardView },
   { path: '/settings', component: SettingsView },
+  { path: '/trade', component: TradeView },
 ]
 
 const router = createRouter({

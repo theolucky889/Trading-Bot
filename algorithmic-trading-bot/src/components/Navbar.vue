@@ -9,6 +9,7 @@ import { RouterLink } from 'vue-router'
       <RouterLink class="text-white hover:text-blue-400" to="/">Home</RouterLink>
       <RouterLink class="text-white hover:text-blue-400" to="/auth">Auth</RouterLink>
       <RouterLink class="text-white hover:text-blue-400" to="/dashboard">Dashboard</RouterLink>
+      <RouterLink class="text-white hover:text-blue-400" to="/trade">Trade</RouterLink>
       <RouterLink class="text-white hover:text-blue-400" to="/settings">Settings</RouterLink>
     </div>
   </nav>
