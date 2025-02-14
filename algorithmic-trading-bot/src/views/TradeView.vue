@@ -1,6 +1,6 @@
 <template>
-  <div class="tradebot-container overflow-auto mb-8 mt-10">
-    <div class="left-sidebar mt-5">
+  <div class="tradebot-container">
+    <div class="left-sidebar">
       <ul>
         <li :class="{ active: activeTab === 'overview' }" @click="activeTab = 'overview'">
           Overview

@@ -20,8 +20,8 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="flex-1 p-8 overflow-auto mb-6 mt-6">
-      <h1 class="text-4xl font-extrabold mb-8 mt-6">Trading Bot Dashboard</h1>
+    <div class="flex-1 p-8 overflow-auto">
+      <h1 class="text-4xl font-extrabold">Trading Bot Dashboard</h1>
 
       <!-- Current Balance Section -->
       <div class="bg-gray-900 p-6 rounded-xl shadow-md">
