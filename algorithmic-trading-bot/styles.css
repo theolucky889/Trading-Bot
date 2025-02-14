@@ -8,6 +8,9 @@ body {
   
   /* Navbar Styling */
   .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: #2a2a3d;
     padding: 15px 20px;
@@ -83,4 +86,143 @@ body {
   .tooltip {
     z-index: 9999 !important;
   }
+
+  .tradebot-container {
+    display: flex;
+    background-color: #1e1e1e; /* Dark background */
+    color: white;         /* White text */
+    height: 100vh;
+  }
   
+  .left-sidebar {
+    width: 200px;
+    background: #2d2d2d;
+    padding: 20px;
+  
+  
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+  
+      li {
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 5px;
+  
+        &.active {
+          background: #3c3c3c; /* Slightly lighter background for active tab */
+        }
+  
+        &:hover {
+          background: #454545;
+        }
+  
+      }
+    }
+  }
+  
+  
+  
+  .main-content {
+    flex: 1;
+    padding: 20px;
+  
+  
+    h2, h3 {
+      margin-bottom: 10px;
+    }
+  
+  
+    .stop-trading {
+      text-align: right; 
+  
+      button {
+        background-color: #007bff; /* Blue button */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s; 
+  
+        &:hover {
+          background-color: #0056b3; /* Darker blue on hover */
+        }
+  
+      }
+    }
+  
+  
+  
+  .trade-item { 
+      background: #333;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+  
+  
+      .trade-details {
+          display: flex;
+          justify-content: space-between;
+  
+  
+          .trade-time {
+              font-size: 0.8em;
+              color: #888;
+          }
+      }
+  }
+  
+  
+  @keyframes fadeIn {
+      from {
+          opacity: 0;
+      }
+      to {
+          opacity: 1;
+      }
+  }
+  
+  .trade-item-enter-active {
+      animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  }
+
+  .trade-item { 
+    background: #333;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+
+
+
+.buy-icon, .sell-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    border-radius: 3px;
+}
+
+
+
+.buy-icon { background-color: green; }
+.sell-icon { background-color: red; }
+
+
+
+
+    .trade-details {
+        flex: 1;
+
+
+
+        .trade-time {
+            font-size: 0.8em;
+            color: #888;
+        }
+    }
+}

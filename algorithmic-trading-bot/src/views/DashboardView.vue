@@ -11,7 +11,10 @@
           </li>
         </ul>
       </nav>
-      <button v-tooltip="'Create a new order'" class="p-3 bg-blue-600 hover:bg-blue-700 transition rounded-lg">
+      <button
+        v-tooltip="'Create a new order'"
+        class="p-3 bg-blue-600 hover:bg-blue-700 transition rounded-lg"
+      >
         New Order
       </button>
     </aside>
@@ -20,68 +23,79 @@
     <div class="flex-1 p-8 overflow-auto mb-6 mt-6">
       <h1 class="text-4xl font-extrabold mb-8 mt-6">Trading Bot Dashboard</h1>
 
-          <!-- Current Balance Section -->
-    <div class="bg-gray-900 p-6 rounded-xl shadow-md">
-      <!-- Top Row: Total Assets, Debt, Net Assets -->
-      <div class="flex justify-between space-x-6 mb-4">
-        <div class="bg-gray-800 p-4 rounded-lg flex-1 text-center">
-          <h2 class="text-lg font-semibold">Total Assets</h2>
-          <p class="text-xl font-bold">$200,000</p>
+      <!-- Current Balance Section -->
+      <div class="bg-gray-900 p-6 rounded-xl shadow-md">
+        <!-- Top Row: Total Assets, Debt, Net Assets -->
+        <div class="flex justify-between space-x-6 mb-4">
+          <div class="bg-gray-800 p-4 rounded-lg flex-1 text-center">
+            <h2 class="text-lg font-semibold">Total Assets</h2>
+            <p class="text-xl font-bold">$200,000</p>
+          </div>
+          <div class="bg-gray-800 p-4 rounded-lg flex-1 text-center">
+            <h2 class="text-lg font-semibold">Debt</h2>
+            <p class="text-xl font-bold">$50,000</p>
+          </div>
+          <div class="bg-gray-800 p-4 rounded-lg flex-1 text-center">
+            <h2 class="text-lg font-semibold">Net Assets</h2>
+            <p class="text-xl font-bold">$150,000</p>
+          </div>
         </div>
-        <div class="bg-gray-800 p-4 rounded-lg flex-1 text-center">
-          <h2 class="text-lg font-semibold">Debt</h2>
-          <p class="text-xl font-bold">$50,000</p>
+
+        <!-- Cash Indicator -->
+        <div class="mb-4">
+          <h3 class="text-md font-semibold mb-1">Cash: $100,000</h3>
+          <div class="bg-gray-700 rounded-full h-4 overflow-hidden">
+            <div class="bg-green-500 h-full" style="width: 60%"></div>
+          </div>
         </div>
-        <div class="bg-gray-800 p-4 rounded-lg flex-1 text-center">
-          <h2 class="text-lg font-semibold">Net Assets</h2>
-          <p class="text-xl font-bold">$150,000</p>
+
+        <!-- Stock Indicator -->
+        <div>
+          <h3 class="text-md font-semibold mb-1">Stock: $100,000</h3>
+          <div class="bg-gray-700 rounded-full h-4 overflow-hidden">
+            <div class="bg-blue-500 h-full" style="width: 70%"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Cash Indicator -->
-      <div class="mb-4">
-        <h3 class="text-md font-semibold mb-1">Cash: $100,000</h3>
-        <div class="bg-gray-700 rounded-full h-4 overflow-hidden">
-          <div class="bg-green-500 h-full" style="width: 60%;"></div>
+      <!-- Category & Stocks Selection (Side by Side) -->
+      <div class="flex items-center space-x-6 mb-6">
+        <!-- Category Selection -->
+        <div class="flex items-center">
+          <label class="mr-3 font-semibold">Select Category:</label>
+          <select
+            v-model="selectedCategory"
+            class="p-3 bg-gray-800 border border-gray-600 rounded-lg"
+          >
+            <option value="us-stocks">US Stocks</option>
+            <option value="taiwan-stocks">Taiwan Stocks</option>
+            <option value="crypto">Crypto</option>
+          </select>
+        </div>
+
+        <!-- Stock Selection -->
+        <div class="flex items-center">
+          <label class="mr-3 font-semibold">Select Stocks (Compare):</label>
+          <select
+            v-model="selectedStocks"
+            multiple
+            class="p-3 bg-gray-800 border border-gray-600 rounded-lg"
+          >
+            <option value="AAPL">Apple (AAPL)</option>
+            <option value="TSLA">Tesla (TSLA)</option>
+            <option value="AMZN">Amazon (AMZN)</option>
+            <option value="GOOGL">Google (GOOGL)</option>
+          </select>
         </div>
       </div>
-
-      <!-- Stock Indicator -->
-      <div>
-        <h3 class="text-md font-semibold mb-1">Stock: $100,000</h3>
-        <div class="bg-gray-700 rounded-full h-4 overflow-hidden">
-          <div class="bg-blue-500 h-full" style="width: 70%;"></div>
-        </div>
-      </div>
-    </div>
-
-        <!-- Category & Stocks Selection (Side by Side) -->
-        <div class="flex items-center space-x-6 mb-6">
-      <!-- Category Selection -->
-      <div class="flex items-center">
-        <label class="mr-3 font-semibold">Select Category:</label>
-        <select v-model="selectedCategory" class="p-3 bg-gray-800 border border-gray-600 rounded-lg">
-          <option value="us-stocks">US Stocks</option>
-          <option value="taiwan-stocks">Taiwan Stocks</option>
-          <option value="crypto">Crypto</option>
-        </select>
-      </div>
-
-      <!-- Stock Selection -->
-      <div class="flex items-center">
-        <label class="mr-3 font-semibold">Select Stocks (Compare):</label>
-        <select v-model="selectedStocks" multiple class="p-3 bg-gray-800 border border-gray-600 rounded-lg">
-          <option value="AAPL">Apple (AAPL)</option>
-          <option value="TSLA">Tesla (TSLA)</option>
-          <option value="AMZN">Amazon (AMZN)</option>
-          <option value="GOOGL">Google (GOOGL)</option>
-        </select>
-      </div>
-    </div>
 
       <!-- Stock Charts -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="p-6 bg-gray-800 rounded-lg shadow-lg" v-for="stock in selectedStocks" :key="stock">
+        <div
+          class="p-6 bg-gray-800 rounded-lg shadow-lg"
+          v-for="stock in selectedStocks"
+          :key="stock"
+        >
           <h2 class="text-2xl font-bold">{{ stock }} Stock Price</h2>
           <canvas :id="stock + selectedGraph + 'StockPriceChart'"></canvas>
         </div>
@@ -147,7 +161,7 @@ const menuItems = ref([
   { name: 'Market' },
   { name: 'Portfolio' },
   { name: 'News' },
-  { name: 'Bot' }
+  { name: 'Bot' },
 ])
 
 const updateCharts = async () => {
