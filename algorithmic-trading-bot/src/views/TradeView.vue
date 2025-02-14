@@ -17,7 +17,7 @@
         </li>
       </ul>
     </div>
-    <div class="main-content font-extrabold mb-8 mt-6">
+    <div class="main-content">
       <h2>Tradebot</h2>
       <p>Tradebot is currently running and has made {{ tradeCount }} trades today.</p>
 
