@@ -226,3 +226,15 @@ body {
         }
     }
 }
+
+.my-component {
+  background-color: #f0f0f0; /* Light gray background */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+
+.my-component h2 { /* Nested styles */
+  color: #333;
+  font-size: 24px;
+}

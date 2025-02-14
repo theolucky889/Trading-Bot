@@ -6,7 +6,9 @@
     <input type="password" placeholder="Password" class="mb-4 p-2 rounded" />
     <div class="flex space-x-4">
       <button class="btn-futuristic">Login</button>
-      <button class="btn-futuristic">Register</button>
+      <RouterLink class="btn-futuristic" to="/register">Register</RouterLink>
     </div>
   </div>
 </template>
+
+
