@@ -1,22 +1,24 @@
-// src/api.js
-export async function fetchStockData(symbols, category) {
-  let apiUrl = ''
+export async function fetchTradeVolume(stock, category) {
+  // Replace with your actual API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5'],
+        values: [1200, 1500, 1800, 1400, 2000], // Example data
+      })
+    }, 500) // Simulate API call delay
+  })
+}
 
-  if (category === 'crypto') {
-    apiUrl = `https://api.binance.com/api/v3/ticker/price?symbol=${symbols[0]}`
-  } else if (category === 'us-stocks') {
-    apiUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbols[0]}&apikey=YOUR_ALPHA_VANTAGE_API_KEY`
-  } else if (category === 'taiwan-stocks') {
-    apiUrl = `https://twseapi.example.com/stock/${symbols[0]}`
-  }
-
-  try {
-    const response = await fetch(apiUrl)
-    const data = await response.json()
-    console.log('Fetched Data:', data)
-    return data
-  } catch (error) {
-    console.error('Error fetching stock data:', error)
-    return null
-  }
+export async function fetchReturnLoss(stock, category) {
+  // Replace with your actual API call.  Example data:
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+        returnValues: [10, 15, 8, 12, 18], // Example return data
+        lossValues: [-5, -2, -7, -3, -1], // Example loss data
+      })
+    }, 500) // Simulate API delay
+  })
 }

@@ -89,15 +89,27 @@
         </div>
       </div>
 
-      <!-- Stock Charts -->
+      <!-- Stock Charts & Related Data -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div
-          class="p-6 bg-gray-800 rounded-lg shadow-lg"
           v-for="stock in selectedStocks"
           :key="stock"
+          class="grid grid-cols-1 lg:grid-cols-2 gap-6"
         >
-          <h2 class="text-2xl font-bold">{{ stock }} Stock Price</h2>
-          <canvas :id="stock + selectedGraph + 'StockPriceChart'"></canvas>
+          <!-- Stock Price Chart -->
+          <div class="p-6 bg-gray-800 rounded-lg shadow-lg col-span-1">
+            <h2 class="text-2xl font-bold">{{ stock }} Stock Price</h2>
+            <canvas :id="stock + selectedGraph + 'StockPriceChart'"></canvas>
+          </div>
+
+          <!-- Trade Volume & Return/Loss Charts -->
+          <div class="p-6 bg-gray-800 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold">Trade Volume & Return/Loss</h2>
+            <canvas :id="stock + 'TradeVolumeChart'"></canvas>
+            <!-- Trade Volume (Bar) -->
+            <canvas :id="stock + 'ReturnLossChart'"></canvas>
+            <!-- Return/Loss (Line) -->
+          </div>
         </div>
       </div>
 
@@ -132,51 +144,19 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { renderCharts } from '../chart.js'
-import { fetchStockData } from '../api.js'
+import { updateCharts } from '../chartManager.js'
 
 const selectedCategory = ref('us-stocks')
 const selectedGraph = ref('line')
 const selectedStocks = ref(['AAPL'])
 
-const availableStocks = ref({
-  'us-stocks': [
-    { name: 'Apple', symbol: 'AAPL' },
-    { name: 'Tesla', symbol: 'TSLA' },
-    { name: 'Amazon', symbol: 'AMZN' },
-    { name: 'Google', symbol: 'GOOGL' },
-  ],
-  'taiwan-stocks': [
-    { name: 'TSMC', symbol: '2330.TW' },
-    { name: 'Hon Hai', symbol: '2317.TW' },
-  ],
-  crypto: [
-    { name: 'Bitcoin', symbol: 'BTCUSDT' },
-    { name: 'Ethereum', symbol: 'ETHUSDT' },
-  ],
+// ... (other refs: availableStocks, menuItems, etc.)
+
+onMounted(async () => {
+  await updateCharts(selectedStocks.value, selectedCategory.value, selectedGraph.value)
 })
 
-const menuItems = ref([
-  { name: 'Home' },
-  { name: 'Market' },
-  { name: 'Portfolio' },
-  { name: 'News' },
-  { name: 'Bot' },
-])
-
-const updateCharts = async () => {
-  try {
-    console.log('Fetching stock data for:', selectedStocks.value)
-    await fetchStockData(selectedStocks.value, selectedCategory.value)
-    console.log('Rendering charts')
-    selectedStocks.value.forEach((stock) => {
-      renderCharts(`${stock}${selectedGraph.value}StockPriceChart`)
-    })
-  } catch (error) {
-    console.error('Error updating charts:', error)
-  }
-}
-
-onMounted(updateCharts)
-watch([selectedGraph, selectedStocks], updateCharts)
+watch([selectedGraph, selectedStocks, selectedCategory], async () => {
+  await updateCharts(selectedStocks.value, selectedCategory.value, selectedGraph.value)
+})
 </script>

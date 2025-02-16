@@ -47,3 +47,44 @@ export async function renderCharts(stockPriceChartId, volumeChartId) {
     },
   })
 }
+
+export function renderBarCharts(chartId, data) {
+  new Chart(document.getElementById(chartId), {
+    type: 'bar',
+    data: {
+      labels: data.labels, // Example: ['Day 1', 'Day 2', ...]
+      datasets: [
+        {
+          label: 'Trade Volume',
+          data: data.values, // Example: [1200, 1500, ...]
+          backgroundColor: 'rgba(54, 162, 235, 0.8)', // Example color
+        },
+      ],
+    },
+    // ... other chart options
+  })
+}
+
+export function renderCombinedCharts(chartId, data) {
+  new Chart(document.getElementById(chartId), {
+    type: 'line', // Use 'line' for Return/Loss
+    data: {
+      labels: data.labels, // Your x-axis labels (e.g., dates)
+      datasets: [
+        {
+          label: 'Return',
+          data: data.returnValues, // Your return data points
+          borderColor: 'green',
+          fill: false,
+        },
+        {
+          label: 'Loss',
+          data: data.lossValues, // Your loss data points
+          borderColor: 'red',
+          fill: false,
+        },
+      ],
+    },
+    // ... other options for the chart
+  }).render()
+}
