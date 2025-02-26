@@ -150,10 +150,18 @@ const selectedCategory = ref('us-stocks')
 const selectedGraph = ref('line')
 const selectedStocks = ref(['AAPL'])
 
-// ... (other refs: availableStocks, menuItems, etc.)
+// Define menuItems
+const menuItems = ref([
+  { name: 'Dashboard' },
+  { name: 'Trade' },
+  { name: 'Settings' },
+  { name: 'About' },
+  { name: 'Login' }
+])
 
-onMounted(async () => {
-  await updateCharts(selectedStocks.value, selectedCategory.value, selectedGraph.value)
+onMounted(() => {
+  console.log('DashboardView mounted')
+  updateCharts(['AAPL'], 'us-stocks', 'line')
 })
 
 watch([selectedGraph, selectedStocks, selectedCategory], async () => {

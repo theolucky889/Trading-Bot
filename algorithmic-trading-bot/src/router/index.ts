@@ -1,23 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import AuthView from '../views/AuthView.vue'
 import DashboardView from '../views/DashboardView.vue'
-import SettingsView from '../views/SettingsView.vue'
 import TradeView from '../views/TradeView.vue'
+import SettingsView from '../views/SettingsView.vue'
+import AboutView from '../views/AboutView.vue'
+import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 
-const routes = [
-  { path: '/', component: HomeView },
-  { path: '/auth', component: AuthView },
-  { path: '/dashboard', component: DashboardView },
-  { path: '/settings', component: SettingsView },
-  { path: '/trade', component: TradeView },
-  { path: '/register', component: RegisterView },
-]
-
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    { path: '/', name: 'dashboard', component: DashboardView },
+    { path: '/trade', name: 'trade', component: TradeView },
+    { path: '/settings', name: 'settings', component: SettingsView },
+    { path: '/about', name: 'about', component: AboutView },
+    { path: '/login', name: 'login', component: LoginView },
+    { path: '/register', name: 'register', component: RegisterView }
+  ]
 })
 
 export default router

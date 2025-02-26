@@ -1,9 +1,31 @@
 import axios from 'axios'
 import Chart from 'chart.js/auto'
 
+// Store chart instances to manage them
+const chartInstances = {}
+
 export async function renderCharts(stockPriceChartId, volumeChartId) {
-  const stockPriceChart = document.getElementById(stockPriceChartId).getContext('2d')
-  const volumeChart = document.getElementById(volumeChartId).getContext('2d')
+  const stockPriceChartElement = document.getElementById(stockPriceChartId)
+  const volumeChartElement = document.getElementById(volumeChartId)
+
+  console.log('Stock Price Chart Element:', stockPriceChartElement)
+  console.log('Volume Chart Element:', volumeChartElement)
+
+  if (!stockPriceChartElement || !volumeChartElement) {
+    console.error('Canvas elements not found')
+    return
+  }
+
+  const stockPriceChart = stockPriceChartElement.getContext('2d')
+  const volumeChart = volumeChartElement.getContext('2d')
+
+  // Destroy existing charts if they exist
+  if (chartInstances[stockPriceChartId]) {
+    chartInstances[stockPriceChartId].destroy()
+  }
+  if (chartInstances[volumeChartId]) {
+    chartInstances[volumeChartId].destroy()
+  }
 
   // Fetch data from Binance API
   const response = await axios.get('https://api.binance.com/api/v3/ticker/24hr')
@@ -14,7 +36,7 @@ export async function renderCharts(stockPriceChartId, volumeChartId) {
   const volumes = data.map((item) => parseFloat(item.volume))
 
   // Create Stock Price Chart
-  new Chart(stockPriceChart, {
+  chartInstances[stockPriceChartId] = new Chart(stockPriceChart, {
     type: 'line',
     data: {
       labels: data.map((item) => item.symbol),
@@ -31,7 +53,7 @@ export async function renderCharts(stockPriceChartId, volumeChartId) {
   })
 
   // Create Volume Chart
-  new Chart(volumeChart, {
+  chartInstances[volumeChartId] = new Chart(volumeChart, {
     type: 'bar',
     data: {
       labels: data.map((item) => item.symbol),
@@ -49,42 +71,76 @@ export async function renderCharts(stockPriceChartId, volumeChartId) {
 }
 
 export function renderBarCharts(chartId, data) {
-  new Chart(document.getElementById(chartId), {
+  const canvasElement = document.getElementById(chartId)
+  console.log('Canvas Element for Bar Chart:', canvasElement)
+
+  if (!canvasElement) {
+    console.error('Canvas element not found for ID:', chartId)
+    return
+  }
+
+  if (chartInstances[chartId]) {
+    chartInstances[chartId].destroy()
+  }
+
+  const context = canvasElement.getContext('2d')
+  if (!context) {
+    console.error('Failed to acquire context for canvas ID:', chartId)
+    return
+  }
+
+  chartInstances[chartId] = new Chart(context, {
     type: 'bar',
     data: {
-      labels: data.labels, // Example: ['Day 1', 'Day 2', ...]
+      labels: data.labels,
       datasets: [
         {
           label: 'Trade Volume',
-          data: data.values, // Example: [1200, 1500, ...]
-          backgroundColor: 'rgba(54, 162, 235, 0.8)', // Example color
+          data: data.values,
+          backgroundColor: 'rgba(54, 162, 235, 0.8)',
         },
       ],
     },
-    // ... other chart options
   })
 }
 
 export function renderCombinedCharts(chartId, data) {
-  new Chart(document.getElementById(chartId), {
-    type: 'line', // Use 'line' for Return/Loss
+  const canvasElement = document.getElementById(chartId)
+  console.log('Canvas Element for Combined Chart:', canvasElement)
+
+  if (!canvasElement) {
+    console.error('Canvas element not found for ID:', chartId)
+    return
+  }
+
+  if (chartInstances[chartId]) {
+    chartInstances[chartId].destroy()
+  }
+
+  const context = canvasElement.getContext('2d')
+  if (!context) {
+    console.error('Failed to acquire context for canvas ID:', chartId)
+    return
+  }
+
+  chartInstances[chartId] = new Chart(context, {
+    type: 'line',
     data: {
-      labels: data.labels, // Your x-axis labels (e.g., dates)
+      labels: data.labels,
       datasets: [
         {
           label: 'Return',
-          data: data.returnValues, // Your return data points
+          data: data.returnValues,
           borderColor: 'green',
           fill: false,
         },
         {
           label: 'Loss',
-          data: data.lossValues, // Your loss data points
+          data: data.lossValues,
           borderColor: 'red',
           fill: false,
         },
       ],
     },
-    // ... other options for the chart
-  }).render()
+  })
 }

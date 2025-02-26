@@ -77,15 +77,33 @@
         Create account
       </button>
     </form>
+
+    <!-- Success Modal -->
+    <div v-if="showSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-white text-black p-6 rounded-lg shadow-lg">
+        <h3 class="text-xl font-bold mb-4">Registration Successful!</h3>
+        <p>You will be redirected to the login page shortly.</p>
+        <button @click="redirectToLogin" class="mt-4 btn-futuristic">Go to Login</button>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div v-if="errorMessage" class="mt-4 text-red-500">
+      {{ errorMessage }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const showSuccessModal = ref(false)
+const errorMessage = ref('')
+const router = useRouter()
 
 const register = async () => {
   try {
@@ -97,8 +115,8 @@ const register = async () => {
     }
 
     // 2. Send registration request to backend API
-    const response = await fetch('/api/register', {
-      // Replace /api/register with your API endpoint
+    const response = await fetch('http://localhost:3000/api/register', {
+      // Update the URL to match your backend
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -113,13 +131,24 @@ const register = async () => {
     if (response.ok) {
       // Registration successful – redirect or show success message
       console.log('Registration successful!')
+      errorMessage.value = ''
+      showSuccessModal.value = true
+      setTimeout(redirectToLogin, 3000) // Automatically redirect after 3 seconds
+    } else if (response.status === 409) {
+      errorMessage.value = 'This email is already registered. Please use a different email.'
     } else {
       const errorData = await response.json()
-      // Show error message to the user (e.g., errorData.message)
+      errorMessage.value = errorData.message || 'An error occurred during registration.'
     }
   } catch (error) {
     // Handle any network or other errors
     console.error('Registration failed:', error)
+    errorMessage.value = 'An error occurred during registration.'
   }
+}
+
+function redirectToLogin() {
+  showSuccessModal.value = false
+  router.push('/login')
 }
 </script>

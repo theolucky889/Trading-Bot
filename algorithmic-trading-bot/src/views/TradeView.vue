@@ -18,20 +18,42 @@
       </ul>
     </div>
     <div class="main-content">
-      <h2>Tradebot</h2>
-      <p>Tradebot is currently running and has made {{ tradeCount }} trades today.</p>
+      <div v-if="activeTab === 'overview'">
+        <h2>Tradebot</h2>
+        <p>Tradebot is currently running and has made {{ tradeCount }} trades today.</p>
 
-      <h3>Trading Status</h3>
-      <div class="stop-trading">
-        <button @click="stopTrading">Stop Trading</button>
+        <h3>Trading Status</h3>
+        <div class="stop-trading">
+          <button @click="stopTrading">Stop Trading</button>
+        </div>
+
+        <h3>Current Trade</h3>
+        <TradeItem v-if="currentTrade" :trade="currentTrade" />
+
+        <h3>Trade History</h3>
+        <div v-for="(trade, index) in tradeHistory" :key="index">
+          <TradeItem :trade="trade" />
+        </div>
       </div>
 
-      <h3>Current Trade</h3>
-      <TradeItem v-if="currentTrade" :trade="currentTrade" />
+      <div v-else-if="activeTab === 'performance'">
+        <h2>Performance</h2>
+        <!-- Add performance content -->
+      </div>
 
-      <h3>Trade History</h3>
-      <div v-for="(trade, index) in tradeHistory" :key="index">
-        <TradeItem :trade="trade" />
+      <div v-else-if="activeTab === 'trades'">
+        <h2>Trades</h2>
+        <!-- Add trades content -->
+      </div>
+
+      <div v-else-if="activeTab === 'settings'">
+        <h2>Settings</h2>
+        <!-- Add settings content -->
+      </div>
+
+      <div v-else-if="activeTab === 'help'">
+        <h2>Help & Feedback</h2>
+        <!-- Add help content -->
       </div>
     </div>
   </div>
