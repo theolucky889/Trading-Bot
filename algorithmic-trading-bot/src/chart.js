@@ -4,7 +4,7 @@ import Chart from 'chart.js/auto'
 // Store chart instances to manage them
 const chartInstances = {}
 
-export async function renderCharts(stockPriceChartId, volumeChartId) {
+export async function renderCharts(stockPriceChartId, volumeChartId, chartType='line') {
   const stockPriceChartElement = document.getElementById(stockPriceChartId)
   const volumeChartElement = document.getElementById(volumeChartId)
 
@@ -37,7 +37,7 @@ export async function renderCharts(stockPriceChartId, volumeChartId) {
 
   // Create Stock Price Chart
   chartInstances[stockPriceChartId] = new Chart(stockPriceChart, {
-    type: 'line',
+    type: chartType,
     data: {
       labels: data.map((item) => item.symbol),
       datasets: [

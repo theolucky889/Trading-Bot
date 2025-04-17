@@ -1,43 +1,36 @@
-export async function fetchStockData(selectedStocks, selectedCategory) {
-  console.log(`Fetching stock data for ${selectedStocks} in category ${selectedCategory}`)
-  // Replace with your actual API call logic
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const data = selectedStocks.map(stock => ({
-        symbol: stock,
-        price: Math.random() * 1000, // Example random price
-      }))
-      console.log('Stock Data:', data)
-      resolve(data)
-    }, 500) // Simulate API call delay
-  })
+const AV_KEY = import.meta.env.VITE_ALPHA_KEY     // put your key in .env
+
+async function getUSPrice(symbol) {
+  const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}&apikey=${AV_KEY}&outputsize=compact`
+  const r   = await fetch(url).then(r => r.json())
+  const series = r['Time Series (Daily)']
+  const labels = Object.keys(series).slice(0, 30).reverse()        // last 30 days
+  const prices = labels.map(d => +series[d]['5. adjusted close'])
+  return { labels, prices }
 }
 
-export async function fetchTradeVolume(stock, category) {
-  console.log(`Fetching trade volume for ${stock} in category ${category}`)
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const data = {
-        labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5'],
-        values: [1200, 1500, 1800, 1400, 2000], // Example data
-      }
-      console.log('Trade Volume Data:', data)
-      resolve(data)
-    }, 500) // Simulate API call delay
-  })
+async function getTWPrice(symbol) {
+  const url = 'https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_AVG_ALL'
+  const list = await fetch(url).then(r => r.json())
+  const row  = list.find(x => x.Code === symbol)
+  return { labels: [row.Date], prices: [+row.Close] }              // simplified
 }
 
-export async function fetchReturnLoss(stock, category) {
-  console.log(`Fetching return/loss for ${stock} in category ${category}`)
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const data = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-        returnValues: [10, 15, 8, 12, 18], // Example return data
-        lossValues: [-5, -2, -7, -3, -1], // Example loss data
-      }
-      console.log('Return/Loss Data:', data)
-      resolve(data)
-    }, 500) // Simulate API delay
-  })
+async function getCryptoPrice(symbol) {
+  const url = 'https://api.binance.com/api/v3/ticker/24hr'
+  const list = await fetch(url).then(r => r.json())
+  const row  = list.find(x => x.symbol === symbol)
+  return { labels: [row.symbol], prices: [+row.lastPrice] }
 }
+
+/* entry‑point used by chartManager */
+export async function fetchStockData(symbol, category) {
+  switch (category) {
+    case 'us-stocks':     return getUSPrice(symbol)
+    case 'taiwan-stocks': return getTWPrice(symbol)
+    default:              return getCryptoPrice(symbol)
+  }
+}
+
+/* mocks left as‑is for volume / return‑loss */
+export { fetchTradeVolume, fetchReturnLoss }     // unchanged

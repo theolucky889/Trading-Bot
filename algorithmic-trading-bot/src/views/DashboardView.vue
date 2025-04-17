@@ -1,71 +1,68 @@
 <template>
-  <div class="flex h-screen bg-gray-900 text-white">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-gray-800 p-6 flex flex-col justify-between shadow-lg rounded-r-lg">
+  <div class="flex min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 text-gray-200 font-inter">
+    <!-- ░░░ Sidebar ░░░ -->
+    <aside class="w-72 bg-gradient-to-b from-gray-800 to-gray-900 p-6 flex flex-col justify-between shadow-xl rounded-r-3xl">
       <nav>
-        <ul>
-          <li v-for="item in menuItems" :key="item.name" class="mb-4">
-            <a href="#" class="block p-3 rounded-lg hover:bg-gray-700 transition">
-              {{ item.name }}
+        <ul class="space-y-3">
+          <li v-for="item in menuItems" :key="item.name">
+            <a
+              href="#"
+              class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors group"
+            >
+              <i class="fas fa-circle text-xs group-hover:text-indigo-400" />
+              <span class="tracking-wide">{{ item.name }}</span>
             </a>
           </li>
         </ul>
       </nav>
       <button
         v-tooltip="'Create a new order'"
-        class="p-3 bg-blue-600 hover:bg-blue-700 transition rounded-lg"
+        class="flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg transition-colors"
       >
-        New Order
+        <i class="fas fa-plus" /> <span>New Order</span>
       </button>
     </aside>
 
-    <!-- Main Content -->
-    <div class="flex-1 p-8 overflow-auto">
-      <h1 class="text-4xl font-extrabold">Trading Bot Dashboard</h1>
+    <!-- ░░░ Main Content ░░░ -->
+    <main class="flex-1 p-8 space-y-10 overflow-y-auto">
+      <h1 class="text-4xl font-extrabold mb-2">Trading Bot Dashboard</h1>
 
-      <!-- Current Balance Section -->
-      <div class="bg-gray-900 p-6 rounded-xl shadow-md">
-        <!-- Top Row: Total Assets, Debt, Net Assets -->
-        <div class="flex justify-between space-x-6 mb-4">
-          <div class="bg-gray-800 p-4 rounded-lg flex-1 text-center">
-            <h2 class="text-lg font-semibold">Total Assets</h2>
-            <p class="text-xl font-bold">$200,000</p>
-          </div>
-          <div class="bg-gray-800 p-4 rounded-lg flex-1 text-center">
-            <h2 class="text-lg font-semibold">Debt</h2>
-            <p class="text-xl font-bold">$50,000</p>
-          </div>
-          <div class="bg-gray-800 p-4 rounded-lg flex-1 text-center">
-            <h2 class="text-lg font-semibold">Net Assets</h2>
-            <p class="text-xl font-bold">$150,000</p>
-          </div>
+      <!-- Balance Widget -->
+      <section class="bg-gray-900/80 p-6 rounded-3xl ring-1 ring-gray-700/40 shadow-xl">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
+          <BalanceCard
+            label="Total Assets"
+            :value="200000"
+            icon="fas fa-coins"
+            color="text-indigo-400"
+          />
+          <BalanceCard
+            label="Debt"
+            :value="50000"
+            icon="fas fa-hand-holding-usd"
+            color="text-red-400"
+          />
+          <BalanceCard
+            label="Net Assets"
+            :value="150000"
+            icon="fas fa-piggy-bank"
+            color="text-green-400"
+          />
         </div>
 
-        <!-- Cash Indicator -->
-        <div class="mb-4">
-          <h3 class="text-md font-semibold mb-1">Cash: $100,000</h3>
-          <div class="bg-gray-700 rounded-full h-4 overflow-hidden">
-            <div class="bg-green-500 h-full" style="width: 60%"></div>
-          </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ProgressBar label="Cash"  :percent="60" bar-color="bg-green-500"  :value="100000" />
+          <ProgressBar label="Stock" :percent="70" bar-color="bg-blue-500"   :value="100000" />
         </div>
+      </section>
 
-        <!-- Stock Indicator -->
-        <div>
-          <h3 class="text-md font-semibold mb-1">Stock: $100,000</h3>
-          <div class="bg-gray-700 rounded-full h-4 overflow-hidden">
-            <div class="bg-blue-500 h-full" style="width: 70%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Category & Stocks Selection (Side by Side) -->
-      <div class="flex items-center space-x-6 mb-6">
-        <!-- Category Selection -->
-        <div class="flex items-center">
-          <label class="mr-3 font-semibold">Select Category:</label>
+      <!-- Controls -->
+      <section class="flex flex-wrap items-end gap-6">
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-400">Select Category</label>
           <select
             v-model="selectedCategory"
-            class="p-3 bg-gray-800 border border-gray-600 rounded-lg"
+            class="px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="us-stocks">US Stocks</option>
             <option value="taiwan-stocks">Taiwan Stocks</option>
@@ -73,84 +70,128 @@
           </select>
         </div>
 
-        <!-- Stock Selection -->
-        <div class="flex items-center">
-          <label class="mr-3 font-semibold">Select Stocks (Compare):</label>
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-400">Select Stocks (Compare)</label>
           <select
             v-model="selectedStocks"
             multiple
-            class="p-3 bg-gray-800 border border-gray-600 rounded-lg"
+            class="px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
           >
-            <option value="AAPL">Apple (AAPL)</option>
-            <option value="TSLA">Tesla (TSLA)</option>
-            <option value="AMZN">Amazon (AMZN)</option>
-            <option value="GOOGL">Google (GOOGL)</option>
+            <option v-for="s in availableStocks" :key="s.value" :value="s.value">
+              {{ s.label }}
+            </option>
           </select>
         </div>
-      </div>
 
-      <!-- Stock Charts & Related Data -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div
-          v-for="stock in selectedStocks"
-          :key="stock"
-          class="grid grid-cols-1 lg:grid-cols-2 gap-6"
-        >
-          <!-- Stock Price Chart -->
-          <div class="p-6 bg-gray-800 rounded-lg shadow-lg col-span-1">
-            <h2 class="text-2xl font-bold">{{ stock }} Stock Price</h2>
-            <canvas :id="stock + selectedGraph + 'StockPriceChart'"></canvas>
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-400">Select Graph Type</label>
+          <select
+            v-model="selectedGraph"
+            class="px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="line">Line</option>
+            <option value="bar">Bar</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Charts -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div v-for="stock in selectedStocks" :key="stock" class="space-y-10">
+          <div class="bg-gray-800/80 p-6 rounded-3xl shadow-lg ring-1 ring-gray-700/40">
+            <h2 class="text-xl font-bold mb-4">{{ stock }} Stock Price</h2>
+            <canvas :id="stock + selectedGraph + 'StockPriceChart'" class="h-72" />
           </div>
 
-          <!-- Trade Volume & Return/Loss Charts -->
-          <div class="p-6 bg-gray-800 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold">Trade Volume & Return/Loss</h2>
-            <canvas :id="stock + 'TradeVolumeChart'"></canvas>
-            <!-- Trade Volume (Bar) -->
-            <canvas :id="stock + 'ReturnLossChart'"></canvas>
-            <!-- Return/Loss (Line) -->
+          <div class="bg-gray-800/80 p-6 rounded-3xl shadow-lg ring-1 ring-gray-700/40">
+            <h2 class="text-xl font-bold mb-4">Trade Volume &amp; Return/Loss</h2>
+            <canvas :id="stock + 'TradeVolumeChart'" class="h-56 mb-8" />
+            <canvas :id="stock + 'ReturnLossChart'" class="h-56" />
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Graph Selection -->
-      <div class="flex items-center mb-6">
-        <label class="mr-3 font-semibold">Select Graph Type:</label>
-        <select v-model="selectedGraph" class="p-3 bg-gray-800 border border-gray-600 rounded-lg">
-          <option value="line">Line</option>
-          <option value="bar">Bar</option>
-        </select>
-      </div>
-
-      <!-- Latest News -->
-      <div class="p-6 bg-gray-800 rounded-lg shadow-lg mb-8">
-        <h2 class="text-2xl font-bold">Latest News</h2>
-        <ul class="list-disc pl-5">
-          <li>AlgoHouse raises $10M in Series A funding</li>
-          <li>AlgoHouse bot helps investors make better decisions</li>
-          <li>AlgoHouse introduces new features for users</li>
-        </ul>
-      </div>
-
-      <!-- Start Trading Button -->
-      <div class="flex justify-end">
-        <button class="p-3 bg-green-600 hover:bg-green-700 transition rounded-lg">
-          Start Trading
-        </button>
-      </div>
-    </div>
+      <!-- News + CTA -->
+      <section class="grid lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 bg-gray-800/80 p-6 rounded-3xl ring-1 ring-gray-700/40 shadow-lg">
+          <h2 class="text-2xl font-bold mb-4">Latest News</h2>
+          <ul class="space-y-2 list-disc list-inside text-gray-300">
+            <li>AlgoHouse raises $10M in Series A funding</li>
+            <li>AlgoHouse bot helps investors make better decisions</li>
+            <li>AlgoHouse introduces new features for users</li>
+          </ul>
+        </div>
+        <div class="flex items-end justify-end">
+          <button class="px-6 py-4 bg-green-600 hover:bg-green-700 rounded-2xl font-semibold shadow-lg transition-colors">
+            Start Trading
+          </button>
+        </div>
+      </section>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { updateCharts } from '../chartManager.js'
+import { ref, computed, onMounted, watch } from 'vue'
+import { updateCharts } from '@/chartManager.js'
+import BalanceCard from '@/components/BalanceCard.vue'
+import ProgressBar from '@/components/ProgressBar.vue'
 
+/* ── reactive state ───────────────────────────────*/
 const selectedCategory = ref('us-stocks')
-const selectedGraph = ref('line')
-const selectedStocks = ref(['AAPL'])
+const selectedGraph    = ref('line')
+const selectedStocks   = ref(['AAPL'])
 
-// Define menuItems
+/* ── static lists ────────────────────────────────*/
+const stockLists = {
+  'us-stocks': [
+    { value: 'AAPL',  label: 'Apple (AAPL)' },
+    { value: 'TSLA',  label: 'Tesla (TSLA)' },
+    { value: 'AMZN',  label: 'Amazon (AMZN)' },
+    { value: 'GOOGL', label: 'Google (GOOGL)' }
+  ],
+  'taiwan-stocks': [
+    { value: '2330', label: 'TSMC (2330)' },
+    { value: '2303', label: 'UMC (2303)' },
+    { value: '0050', label: 'Yuanta 50 ETF (0050)' }
+  ],
+  crypto: [
+    { value: 'BTCUSDT', label: 'Bitcoin (BTC)' },
+    { value: 'ETHUSDT', label: 'Ethereum (ETH)' },
+    { value: 'BNBUSDT', label: 'BNB (BNB)' }
+  ]
+}
+
+const availableStocks = computed(() => stockLists[selectedCategory.value] ?? [])
+
+/* ── sync selection on category change ───────────*/
+watch(
+  selectedCategory,
+  () => {
+    if (!availableStocks.value.find(s => selectedStocks.value.includes(s.value))) {
+      selectedStocks.value = [availableStocks.value[0]?.value]
+    }
+  },
+  { immediate: true }
+)
+
+/* ── redraw charts on any change ────────────────*/
+watch(
+  () => ({
+    g: selectedGraph.value,
+    c: selectedCategory.value,
+    s: [...selectedStocks.value]
+  }),
+  ({ g, c, s }) => updateCharts(s, c, g),
+  { flush: 'post' }
+)
+
+/* ── initial draw ───────────────────────────────*/
+onMounted(() => {
+  updateCharts(selectedStocks.value, selectedCategory.value, selectedGraph.value)
+})
+
+/* ── sidebar menu items ─────────────────────────*/
 const menuItems = ref([
   { name: 'Dashboard' },
   { name: 'Trade' },
@@ -158,13 +199,8 @@ const menuItems = ref([
   { name: 'About' },
   { name: 'Login' }
 ])
-
-onMounted(() => {
-  console.log('DashboardView mounted')
-  updateCharts(['AAPL'], 'us-stocks', 'line')
-})
-
-watch([selectedGraph, selectedStocks, selectedCategory], async () => {
-  await updateCharts(selectedStocks.value, selectedCategory.value, selectedGraph.value)
-})
 </script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+</style>
