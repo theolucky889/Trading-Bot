@@ -1,22 +1,31 @@
-import { renderCharts, renderBarCharts, renderCombinedCharts } from './chart.js'
-import { fetchTradeVolume } from './api.js'
+import { renderCharts } from './chart.js'
+import { fetchStockData } from '@/api.js'
 
+/**
+ * Redraw charts whenever the user changes stocks, category, or graph type
+ *
+ * @param {string[]} selectedStocks    array of symbols (e.g. ['AAPL', 'TSLA'])
+ * @param {string}   selectedCategory  'us-stocks' | 'taiwan-stocks' | 'crypto'
+ * @param {string}   selectedGraph     'line' | 'bar'
+ */
 export async function updateCharts(selectedStocks, selectedCategory, selectedGraph) {
   try {
     for (const stock of selectedStocks) {
-      const priceId  = `${stock}${selectedGraph}StockPriceChart`
+      // IDs that match the <canvas> elements in Dashboard.vue
+      const priceId = `${stock}${selectedGraph}StockPriceChart`
       const volumeId = `${stock}TradeVolumeChart`
 
-      const tradeVol    = await fetchTradeVolume(stock, selectedCategory);
-
-      /* 1️⃣ price line + (temporary) volume bars — needs TWO IDs */
-      renderCharts(priceId, volumeId, selectedGraph, stock, selectedCategory)
-
-      /* 2️⃣ overwrite the volume canvas with the nicer bar chart */
-      renderBarCharts(priceId, tradeVol, selectedGraph);
-
+      // Fetch price & volume data based on category
+      // Market logic lives inside renderCharts via fetchStockData
+      await renderCharts(
+        priceId,
+        volumeId,
+        selectedGraph,
+        stock,
+        selectedCategory
+      )
     }
   } catch (err) {
-    console.error('Error updating charts:', err);
+    console.error('updateCharts error:', err)
   }
 }
