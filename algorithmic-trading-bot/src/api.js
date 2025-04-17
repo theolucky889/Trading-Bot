@@ -32,5 +32,14 @@ export async function fetchStockData(symbol, category) {
   }
 }
 
-/* mocks left as‑is for volume / return‑loss */
-export { fetchTradeVolume, fetchReturnLoss }     // unchanged
+// /* mocks left as‑is for volume / return‑loss */
+// export { fetchTradeVolume, fetchReturnLoss }     // unchanged
+// src/api.js  ─ add at the bottom or keep with the other mocks
+export async function fetchReturnLoss(symbol, category) {
+  // 🔸 Replace this mock with a real API later
+  return {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+    returnValues: [10, 15, 8, 12, 18],
+    lossValues:   [-5, -2, -7, -3, -1]
+  }
+}
