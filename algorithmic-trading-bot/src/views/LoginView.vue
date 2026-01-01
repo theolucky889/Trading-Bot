@@ -54,34 +54,34 @@ const showSuccessModal = ref(false)
 const router = useRouter()
 
 async function login() {
-  console.log('Login function called')
-  console.log('Email:', email.value)
-  console.log('Password:', password.value)
+  errorMessage.value = ''
 
   try {
-    const response = await fetch('http://localhost:3000/api/login', {
+    // ✅ Use Vite proxy (no CORS issues)
+    const response = await fetch('/api/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: email.value,
         password: password.value,
       }),
     })
 
-    console.log('Response status:', response.status)
+    const data = await response.json().catch(() => null)
 
-    if (response.ok) {
-      console.log('Login successful!')
-      errorMessage.value = ''
-      showSuccessModal.value = true
-      setTimeout(redirectToDashboard, 3000) // Automatically redirect after 3 seconds
-    } else {
-      const errorData = await response.json()
-      console.error('Login error:', errorData.message)
-      errorMessage.value = errorData.message || 'An error occurred during login.'
+    if (!response.ok) {
+      errorMessage.value = data?.message || 'An error occurred during login.'
+      return
     }
+
+    // ✅ Save JWT token
+    if (data?.token) {
+      localStorage.setItem('auth_token', data.token)
+      localStorage.setItem('auth_email', email.value) // optional
+    }
+
+    showSuccessModal.value = true
+    setTimeout(redirectToDashboard, 800) // shorter feels better
   } catch (error) {
     console.error('Login failed:', error)
     errorMessage.value = 'An error occurred during login.'
@@ -90,6 +90,7 @@ async function login() {
 
 function redirectToDashboard() {
   showSuccessModal.value = false
-  router.push('/dashboard')
+  // ✅ Your router dashboard path is '/'
+  router.push({ name: 'dashboard' }) // or router.push('/')
 }
-</script> 
+</script>
