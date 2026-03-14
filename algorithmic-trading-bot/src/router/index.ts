@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashboardView from '../views/DashboardView.vue'
 import TradeView from '../views/TradeView.vue'
+import StrategyView from '../views/StrategyView.vue'
+import PredictionView from '../views/PredictionView.vue'
 import SettingsView from '../views/SettingsView.vue'
 import AboutView from '../views/AboutView.vue'
 import LoginView from '../views/LoginView.vue'
@@ -11,6 +13,8 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'dashboard', component: DashboardView },
     { path: '/trade', name: 'trade', component: TradeView },
+    { path: '/strategy', name: 'strategy', component: StrategyView },
+    { path: '/prediction', name: 'prediction', component: PredictionView },
     { path: '/settings', name: 'settings', component: SettingsView },
     { path: '/about', name: 'about', component: AboutView },
     { path: '/login', name: 'login', component: LoginView },

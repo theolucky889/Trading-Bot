@@ -38,6 +38,20 @@ function logout() {
           <i class="fas fa-arrow-right-arrow-left mr-1.5 text-xs" />Trade
         </RouterLink>
         <RouterLink
+          to="/strategy"
+          class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+          active-class="text-white bg-gray-800"
+        >
+          <i class="fas fa-chart-line mr-1.5 text-xs" />Strategy
+        </RouterLink>
+        <RouterLink
+          to="/prediction"
+          class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+          active-class="text-white bg-gray-800"
+        >
+          <i class="fas fa-brain mr-1.5 text-xs" />Predictions
+        </RouterLink>
+        <RouterLink
           to="/settings"
           class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
           active-class="text-white bg-gray-800"
