@@ -1,5 +1,4 @@
 import { renderCharts } from './chart.js'
-import { fetchStockData } from '@/api.js'
 
 /**
  * Redraw charts whenever the user changes stocks, category, or graph type
@@ -12,14 +11,14 @@ export async function updateCharts(selectedStocks, selectedCategory, selectedGra
   try {
     for (const stock of selectedStocks) {
       // IDs that match the <canvas> elements in Dashboard.vue
-      const priceId = `${stock}${selectedGraph}StockPriceChart`
-      const volumeId = `${stock}TradeVolumeChart`
+      const priceId      = `${stock}${selectedGraph}StockPriceChart`
+      const volumeId     = `${stock}TradeVolumeChart`
+      const returnLossId = `${stock}ReturnLossChart`
 
-      // Fetch price & volume data based on category
-      // Market logic lives inside renderCharts via fetchStockData
       await renderCharts(
         priceId,
         volumeId,
+        returnLossId,
         selectedGraph,
         stock,
         selectedCategory

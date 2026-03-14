@@ -1,25 +1,28 @@
 import Chart from 'chart.js/auto'
 import { getUSDaily, getTWSEDaily, getKlines } from '@/api/quotes.js'
+import { fetchReturnLoss } from '@/api.js'
 
 const chartInstances = {}
 
 export async function renderCharts(
   stockPriceChartId,
   volumeChartId,
+  returnLossChartId,
   chartType = 'line',
   symbol,
   category
 ) {
-  const priceCtx  = document.getElementById(stockPriceChartId)?.getContext('2d')
-  const volumeCtx = document.getElementById(volumeChartId)?.getContext('2d')
+  const priceCtx      = document.getElementById(stockPriceChartId)?.getContext('2d')
+  const volumeCtx     = document.getElementById(volumeChartId)?.getContext('2d')
+  const returnLossCtx = document.getElementById(returnLossChartId)?.getContext('2d')
   if (!priceCtx || !volumeCtx) return console.error('canvas not found')
 
-  // 1️⃣ Destroy any existing charts
-  [stockPriceChartId, volumeChartId].forEach(id => {
+  // Destroy any existing charts
+  [stockPriceChartId, volumeChartId, returnLossChartId].forEach(id => {
     if (chartInstances[id]) chartInstances[id].destroy()
   })
 
-  // 2️⃣ Fetch the correct price series
+  // Fetch the correct price series
   let series
   switch (category) {
     case 'us-stocks':     series = await getUSDaily(symbol);   break
@@ -27,7 +30,7 @@ export async function renderCharts(
     default:              series = await getKlines(symbol);    break
   }
 
-  // 3️⃣ Price chart (line or bar, per toggle)
+  // Price chart (line or bar, per toggle)
   chartInstances[stockPriceChartId] = new Chart(priceCtx, {
     type: chartType,
     data: {
@@ -45,7 +48,7 @@ export async function renderCharts(
     }
   })
 
-  // 4️⃣ Volume placeholder – you can call a real volume endpoint here
+  // Volume placeholder
   chartInstances[volumeChartId] = new Chart(volumeCtx, {
     type: 'bar',
     data: {
@@ -55,4 +58,27 @@ export async function renderCharts(
       ]
     }
   })
+
+  // Return/Loss chart
+  if (returnLossCtx) {
+    const rl = await fetchReturnLoss(symbol, category)
+    chartInstances[returnLossChartId] = new Chart(returnLossCtx, {
+      type: 'bar',
+      data: {
+        labels: rl.labels,
+        datasets: [
+          {
+            label: 'Return',
+            data: rl.returnValues,
+            backgroundColor: 'rgba(74, 222, 128, 0.6)'
+          },
+          {
+            label: 'Loss',
+            data: rl.lossValues,
+            backgroundColor: 'rgba(248, 113, 113, 0.6)'
+          }
+        ]
+      }
+    })
+  }
 }

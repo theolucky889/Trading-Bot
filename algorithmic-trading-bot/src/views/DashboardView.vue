@@ -5,13 +5,13 @@
       <nav>
         <ul class="space-y-3">
           <li v-for="item in menuItems" :key="item.name">
-            <a
-              href="#"
+            <RouterLink
+              :to="item.path"
               class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors group"
             >
               <i class="fas fa-circle text-xs group-hover:text-indigo-400" />
               <span class="tracking-wide">{{ item.name }}</span>
-            </a>
+            </RouterLink>
           </li>
         </ul>
       </nav>
@@ -34,19 +34,19 @@
             label="Total Assets"
             :value="200000"
             icon="fas fa-coins"
-            color="text-indigo-400"
+            text-color="text-indigo-400"
           />
           <BalanceCard
             label="Debt"
             :value="50000"
             icon="fas fa-hand-holding-usd"
-            color="text-red-400"
+            text-color="text-red-400"
           />
           <BalanceCard
             label="Net Assets"
             :value="150000"
             icon="fas fa-piggy-bank"
-            color="text-green-400"
+            text-color="text-green-400"
           />
         </div>
 
@@ -133,6 +133,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+import { RouterLink } from 'vue-router'
 import { updateCharts } from '@/chartManager.js'
 import BalanceCard from '@/components/BalanceCard.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
@@ -193,11 +194,11 @@ onMounted(() => {
 
 /* ── sidebar menu items ─────────────────────────*/
 const menuItems = ref([
-  { name: 'Dashboard' },
-  { name: 'Trade' },
-  { name: 'Settings' },
-  { name: 'About' },
-  { name: 'Login' }
+  { name: 'Dashboard', path: '/' },
+  { name: 'Trade',     path: '/trade' },
+  { name: 'Settings',  path: '/settings' },
+  { name: 'About',     path: '/about' },
+  { name: 'Login',     path: '/login' }
 ])
 </script>
 

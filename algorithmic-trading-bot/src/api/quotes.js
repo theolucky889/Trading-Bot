@@ -14,6 +14,7 @@ export async function getUSDaily(symbol) {
     }
   )
   const series = data['Time Series (Daily)']
+  if (!series) throw new Error(`Alpha Vantage returned no data for ${symbol}. Check your API key or rate limits.`)
   const labels = Object.keys(series).slice(0, 30).reverse()
   const prices = labels.map(d => +series[d]['5. adjusted close'])
   return { labels, prices }
