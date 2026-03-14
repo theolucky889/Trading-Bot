@@ -27,12 +27,6 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
       },
-      // α‑Vantage  →  /av/...
-      '/av': {
-        target: 'https://www.alphavantage.co',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/av/, '')
-      },
       // TWSE       →  /twse/...
       '/twse': {
         target: 'https://www.twse.com.tw/exchangeReport',

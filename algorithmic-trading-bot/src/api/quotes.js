@@ -1,45 +1,45 @@
 import axios from 'axios'
 
-const AV_KEY = import.meta.env.VITE_ALPHA_KEY     // free Alpha‑Vantage key
-
-export async function getUSDaily(symbol) {
-  const { data } = await axios.get(
-    `/av/query`, {
-      params: {
-        function: 'TIME_SERIES_DAILY_ADJUSTED',
-        symbol,
-        apikey: AV_KEY,
-        outputsize: 'compact'
-      }
-    }
-  )
-  const series = data['Time Series (Daily)']
-  if (!series) throw new Error(`Alpha Vantage returned no data for ${symbol}. Check your API key or rate limits.`)
-  const labels = Object.keys(series).slice(0, 30).reverse()
-  const prices = labels.map(d => +series[d]['5. adjusted close'])
-  return { labels, prices }
+function authHeaders() {
+  const token = localStorage.getItem('auth_token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-/* TWSE – via proxy to https://www.twse.com.tw/exchangeReport */
-export async function getTWSEDaily(stockNo) {
+/** US stock daily prices — proxied through backend using user's stored AV key */
+export async function getUSDaily(symbol) {
+  const { data } = await axios.get(`/api/market/stock/${encodeURIComponent(symbol)}`, {
+    headers: authHeaders(),
+  })
+  return { labels: data.labels, prices: data.prices }
+}
+
+/** Forex daily prices — proxied through backend using user's stored AV key */
+export async function getForexDaily(fromSymbol, toSymbol = 'USD') {
   const { data } = await axios.get(
-    `/twse/STOCK_DAY`, { params: { response: 'json', date: '', stockNo } }
+    `/api/market/forex/${encodeURIComponent(fromSymbol)}/${encodeURIComponent(toSymbol)}`,
+    { headers: authHeaders() },
   )
-  // latest close is at data.data[data.data.length‑1][6]
+  return { labels: data.labels, prices: data.prices }
+}
+
+/** Crypto daily prices — proxied through backend, uses Binance public API (no key needed) */
+export async function getKlines(symbol = 'BTCUSDT', limit = 60) {
+  const { data } = await axios.get(`/api/market/crypto/${encodeURIComponent(symbol)}`, {
+    params: { limit },
+  })
   return {
-    labels: data.data.map(r => r[0]),
-    prices: data.data.map(r => +r[6])
+    labels: data.labels.map(ts => new Date(Number(ts)).toLocaleDateString()),
+    prices: data.prices,
   }
 }
 
-/* Crypto via Binance */
-export async function getKlines(symbol = 'BTCUSDT', limit = 30) {
-  const { data } = await axios.get(
-    `https://api.binance.com/api/v3/klines`,
-    { params: { symbol, interval: '1d', limit } }
-  )
+/** Taiwan stock daily prices — still proxied via Vite → TWSE (no key needed) */
+export async function getTWSEDaily(stockNo) {
+  const { data } = await axios.get('/twse/STOCK_DAY', {
+    params: { response: 'json', date: '', stockNo },
+  })
   return {
-    labels: data.map(k => new Date(k[0]).toLocaleDateString()),
-    prices: data.map(k => +k[4])
+    labels: data.data.map(r => r[0]),
+    prices: data.data.map(r => +r[6]),
   }
 }

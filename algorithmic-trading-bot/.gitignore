@@ -1,4 +1,4 @@
-# Logs
+# ── Logs ─────────────────────────────────────────────────────────────────────
 logs
 *.log
 npm-debug.log*
@@ -7,17 +7,25 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# ── Dependencies ─────────────────────────────────────────────────────────────
 node_modules
-.DS_Store
+
+# ── Environment & Secrets ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Build output ─────────────────────────────────────────────────────────────
 dist
 dist-ssr
 coverage
 *.local
 
+# ── Test artifacts ───────────────────────────────────────────────────────────
 /cypress/videos/
 /cypress/screenshots/
 
-# Editor directories and files
+# ── Editor directories and files ─────────────────────────────────────────────
 .vscode/*
 !.vscode/extensions.json
 .idea

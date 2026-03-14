@@ -1,2 +1,35 @@
-# ignore file
-E:\Github\Trading-Bot\algorithmic-trading-bot\.env
+# ── Environment & Secrets ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.p12
+
+# ── User / Runtime Data ──────────────────────────────────────────────────────
+backend/users.json
+backend/data/
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/**/*.pyc
+*.pyc
+
+# ── Node ─────────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Build output ─────────────────────────────────────────────────────────────
+dist/
+dist-ssr/
+coverage/
+
+# ── OS / Editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.suo
+*.sw?
+.idea/

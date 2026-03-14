@@ -21,6 +21,7 @@
             class="bg-gray-900/70 border border-gray-600 text-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="us-stocks">US Stocks</option>
             <option value="crypto">Crypto</option>
+            <option value="forex">Forex</option>
             <option value="taiwan-stocks">Taiwan Stocks</option>
           </select>
         </div>
@@ -230,7 +231,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { getUSDaily, getTWSEDaily, getKlines } from '@/api/quotes.js'
+import { getUSDaily, getTWSEDaily, getKlines, getForexDaily } from '@/api/quotes.js'
 import { generateSignal, type TradingSignal } from '@/utils/indicators'
 
 const market = ref('us-stocks')
@@ -248,18 +249,48 @@ const stockLists: Record<string, { value: string; label: string }[]> = {
     { value: 'MSFT',  label: 'Microsoft (MSFT)' },
     { value: 'NVDA',  label: 'NVIDIA (NVDA)' },
     { value: 'META',  label: 'Meta (META)' },
+    { value: 'NFLX',  label: 'Netflix (NFLX)' },
+    { value: 'AMD',   label: 'AMD (AMD)' },
+    { value: 'INTC',  label: 'Intel (INTC)' },
+    { value: 'JPM',   label: 'JPMorgan (JPM)' },
+    { value: 'BAC',   label: 'Bank of America (BAC)' },
+    { value: 'SPY',   label: 'S&P 500 ETF (SPY)' },
+    { value: 'QQQ',   label: 'Nasdaq 100 ETF (QQQ)' },
   ],
   crypto: [
-    { value: 'BTCUSDT', label: 'Bitcoin (BTC)' },
-    { value: 'ETHUSDT', label: 'Ethereum (ETH)' },
-    { value: 'BNBUSDT', label: 'BNB (BNB)' },
-    { value: 'SOLUSDT', label: 'Solana (SOL)' },
-    { value: 'XRPUSDT', label: 'XRP (XRP)' },
+    { value: 'BTCUSDT',  label: 'Bitcoin (BTC)' },
+    { value: 'ETHUSDT',  label: 'Ethereum (ETH)' },
+    { value: 'BNBUSDT',  label: 'BNB (BNB)' },
+    { value: 'SOLUSDT',  label: 'Solana (SOL)' },
+    { value: 'XRPUSDT',  label: 'XRP (XRP)' },
+    { value: 'ADAUSDT',  label: 'Cardano (ADA)' },
+    { value: 'DOGEUSDT', label: 'Dogecoin (DOGE)' },
+    { value: 'AVAXUSDT', label: 'Avalanche (AVAX)' },
+    { value: 'DOTUSDT',  label: 'Polkadot (DOT)' },
+    { value: 'LINKUSDT', label: 'Chainlink (LINK)' },
+    { value: 'MATICUSDT',label: 'Polygon (MATIC)' },
+    { value: 'LTCUSDT',  label: 'Litecoin (LTC)' },
+  ],
+  forex: [
+    { value: 'EUR/USD', label: 'Euro / US Dollar (EUR/USD)' },
+    { value: 'GBP/USD', label: 'British Pound / USD (GBP/USD)' },
+    { value: 'USD/JPY', label: 'US Dollar / Yen (USD/JPY)' },
+    { value: 'AUD/USD', label: 'Australian Dollar / USD (AUD/USD)' },
+    { value: 'USD/CAD', label: 'US Dollar / Canadian Dollar (USD/CAD)' },
+    { value: 'USD/CHF', label: 'US Dollar / Swiss Franc (USD/CHF)' },
+    { value: 'NZD/USD', label: 'New Zealand Dollar / USD (NZD/USD)' },
+    { value: 'EUR/GBP', label: 'Euro / British Pound (EUR/GBP)' },
+    { value: 'EUR/JPY', label: 'Euro / Yen (EUR/JPY)' },
+    { value: 'GBP/JPY', label: 'British Pound / Yen (GBP/JPY)' },
   ],
   'taiwan-stocks': [
     { value: '2330', label: 'TSMC (2330)' },
+    { value: '2317', label: 'Hon Hai (2317)' },
+    { value: '2454', label: 'MediaTek (2454)' },
     { value: '2303', label: 'UMC (2303)' },
+    { value: '2882', label: 'Cathay Financial (2882)' },
     { value: '0050', label: 'Yuanta 50 ETF (0050)' },
+    { value: '0056', label: 'High Dividend ETF (0056)' },
   ],
 }
 
@@ -282,6 +313,10 @@ async function analyze() {
       prices = data.prices
     } else if (market.value === 'taiwan-stocks') {
       const data = await getTWSEDaily(symbol.value)
+      prices = data.prices
+    } else if (market.value === 'forex') {
+      const [from, to] = symbol.value.split('/')
+      const data = await getForexDaily(from, to)
       prices = data.prices
     } else {
       const data = await getKlines(symbol.value)
