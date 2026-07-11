@@ -1,7 +1,7 @@
 import argparse
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 # ✅ Local import (same folder)
 from sentiment_analysis import analyze
@@ -19,7 +19,7 @@ def main():
     # Ensure minimum fields exist (frontend expects these)
     result.setdefault("query", args.query)
     result.setdefault("model", args.model)
-    result.setdefault("generated_at", datetime.utcnow().isoformat() + "Z")
+    result.setdefault("generated_at", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f") + "Z")
     result.setdefault("summary", {})
     result["summary"].setdefault("positive", 0)
     result["summary"].setdefault("neutral", 0)

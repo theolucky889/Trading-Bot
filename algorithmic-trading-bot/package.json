@@ -16,11 +16,13 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.0",
+    "@tailwindcss/vite": "^4.3.2",
+    "axios": "^1.18.1",
+    "chart.js": "^4.5.1",
+    "floating-vue": "^5.2.2",
     "pinia": "^2.0.0",
-    "chart.js": "^3.0.0",
-    "axios": "^0.21.0"
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",

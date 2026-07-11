@@ -8,6 +8,8 @@
           type="email"
           v-model="email"
           placeholder="Email"
+          required
+          autocomplete="email"
           class="w-96 bg-gray-800 border border-gray-700 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -16,10 +18,17 @@
           type="password"
           v-model="password"
           placeholder="Password"
+          required
+          autocomplete="current-password"
           class="w-96 bg-gray-800 border border-gray-700 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      <button type="submit" class="btn-futuristic">Login</button>
+      <button
+        type="submit"
+        class="w-96 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-lg transition-colors"
+      >
+        Login
+      </button>
     </form>
 
     <!-- Error Message -->
@@ -27,13 +36,9 @@
       {{ errorMessage }}
     </div>
 
-    <!-- Success Modal -->
-    <div v-if="showSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div class="bg-white text-black p-6 rounded-lg shadow-lg">
-        <h3 class="text-xl font-bold mb-4">Login Successful!</h3>
-        <p>You will be redirected to the dashboard shortly.</p>
-        <button @click="redirectToDashboard" class="mt-4 btn-futuristic">Go to Dashboard</button>
-      </div>
+    <!-- Success banner: brief confirmation, then auto-redirect (single flow) -->
+    <div v-if="success" class="mt-4 rounded-lg bg-green-900/40 border border-green-700 px-4 py-3 text-green-300">
+      Login successful — redirecting…
     </div>
 
     <!-- Link to Register -->
@@ -45,13 +50,14 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
-const showSuccessModal = ref(false)
+const success = ref(false)
 const router = useRouter()
+const route = useRoute()
 
 async function login() {
   errorMessage.value = ''
@@ -80,8 +86,9 @@ async function login() {
       localStorage.setItem('auth_email', email.value) // optional
     }
 
-    showSuccessModal.value = true
-    setTimeout(redirectToDashboard, 800) // shorter feels better
+    // Single flow: show a brief success state, then auto-redirect once.
+    success.value = true
+    setTimeout(redirectToDashboard, 800)
   } catch (error) {
     console.error('Login failed:', error)
     errorMessage.value = 'An error occurred during login.'
@@ -89,8 +96,12 @@ async function login() {
 }
 
 function redirectToDashboard() {
-  showSuccessModal.value = false
-  // ✅ Your router dashboard path is '/'
-  router.push({ name: 'dashboard' }) // or router.push('/')
+  // Honor a redirect-back query set by the route guard; otherwise go to the dashboard.
+  const redirect = route.query.redirect
+  if (typeof redirect === 'string' && redirect) {
+    router.push(redirect)
+  } else {
+    router.push({ name: 'dashboard' })
+  }
 }
 </script>

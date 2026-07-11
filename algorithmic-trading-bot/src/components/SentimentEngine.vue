@@ -11,7 +11,7 @@
         />
         <div class="text-xs text-gray-500">
           Detected: <span class="font-medium text-gray-700">{{ parsedQueries.length }}</span>
-          query{{ parsedQueries.length === 1 ? '' : 'ies' }}
+          {{ parsedQueries.length === 1 ? 'query' : 'queries' }}
         </div>
 
         <div v-if="parsedQueries.length > 0" class="flex flex-wrap gap-2">
@@ -112,14 +112,21 @@
           </div>
 
           <div class="mt-1 text-xs text-gray-500">
-            Avg: {{ item.summary?.avg_compound ?? '-' }}
-            • +{{ item.summary?.positive ?? 0 }}
-            / ={{ item.summary?.neutral ?? 0 }}
-            / -{{ item.summary?.negative ?? 0 }}
+            Avg: {{ item.summary?.avg_compound ?? item.avgCompound ?? '-' }}
+            <span v-if="item.numArticles"> • {{ item.numArticles }} articles</span>
           </div>
         </li>
       </ul>
     </div>
+
+    <!-- Model-fallback / data warning for the selected result (e.g. FinBERT → VADER).
+         Surfaced next to the results in every path, not just at the top. -->
+    <p
+      v-if="selectedResult?.warning"
+      class="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-800"
+    >
+      {{ selectedResult.warning }}
+    </p>
 
     <!-- ✅ Multi-result list -->
     <div v-if="results.length > 0" class="mt-4 rounded-xl border border-gray-200 bg-white">
@@ -250,6 +257,7 @@ type SentimentRunHistoryItem = {
   query: string
   model: string
   numArticles?: number
+  avgCompound?: number
   generatedAt?: string
   createdAt?: string
   summary?: SentimentSummary
@@ -330,6 +338,31 @@ export default defineComponent({
       }
     }
 
+    // Persist a single sentiment run to the per-user history (auth server).
+    // Best-effort: silently no-op when logged out or on failure.
+    const saveHistory = async (data: SentimentResult) => {
+      const token = localStorage.getItem('auth_token')
+      if (!token) return
+      try {
+        await fetch('/api/sentiment/history', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            query: data.query,
+            numArticles: numArticles.value,
+            model: data.model || model.value,
+            avgCompound: data.summary?.avg_compound,
+          }),
+        })
+      } catch {
+        // ignore — history persistence is non-critical
+      }
+    }
+
     const runAll = async () => {
       error.value = ''
       warning.value = ''
@@ -349,6 +382,8 @@ export default defineComponent({
           const data = await fetchMarketSentiment(q, numArticles.value, model.value)
           out.push(data)
           if (data?.warning) warning.value = data.warning
+          // Persist this run for logged-in users (best-effort).
+          await saveHistory(data)
         }
 
         results.value = out

@@ -3,10 +3,11 @@ import { defineConfig } from 'vite'
 import vue            from '@vitejs/plugin-vue'
 import vueJsx         from '@vitejs/plugin-vue-jsx'
 import vueDevTools    from 'vite-plugin-vue-devtools'
+import tailwindcss    from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), vueJsx(), vueDevTools()],
+  plugins: [vue(), vueJsx(), vueDevTools(), tailwindcss()],
 
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) }
@@ -14,18 +15,11 @@ export default defineConfig({
 
   server: {
     proxy: {
-      // α‑Vantage  →  /av/...
-      '/av': {
-        target: 'https://www.alphavantage.co',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/av/, '')
-      },
-      // TWSE       →  /twse/...
-      '/twse': {
-        target: 'https://www.twse.com.tw/exchangeReport',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/twse/, '')
-      }
+      // All /api/* → FastAPI (backend/app.py, port 8000). Auth (register,
+      // login, session, per-user sentiment history) is now served by FastAPI
+      // + SQLite (backend/auth.py); the legacy Express server (server.js) is
+      // no longer wired to the dev proxy.
+      '/api': { target: 'http://localhost:8000', changeOrigin: true }
     }
   }
 })

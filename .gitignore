@@ -1,2 +1,23 @@
-# ignore file
-E:\Github\Trading-Bot\algorithmic-trading-bot\.env
+# Dependencies
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+.env.local
+
+# Auth SQLite database (FastAPI + SQLite auth backend)
+backend/data/
+*.db
+*.db-wal
+*.db-shm
+
+# Build output
+dist/
+
+# Orchestrator scratch artifacts
+_workspace/
+_workspace_prev/

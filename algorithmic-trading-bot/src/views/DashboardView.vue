@@ -2,19 +2,10 @@
   <div class="flex min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 text-gray-200 font-inter">
     <!-- ░░░ Sidebar ░░░ -->
     <aside class="w-72 bg-gradient-to-b from-gray-800 to-gray-900 p-6 flex flex-col justify-between shadow-xl rounded-r-3xl">
-      <nav>
-        <ul class="space-y-3">
-          <li v-for="item in menuItems" :key="item.name">
-            <a
-              href="#"
-              class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors group"
-            >
-              <i class="fas fa-circle text-xs group-hover:text-indigo-400" />
-              <span class="tracking-wide">{{ item.name }}</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+      <div>
+        <h2 class="text-lg font-bold mb-2 tracking-wide">Quick Actions</h2>
+        <p class="text-xs text-gray-500 mb-4">Use the top navigation bar to move between pages.</p>
+      </div>
       <button
         v-tooltip="'Create a new order'"
         class="flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg transition-colors"
@@ -29,6 +20,15 @@
 
       <!-- Balance Widget -->
       <section class="bg-gray-900/80 p-6 rounded-3xl ring-1 ring-gray-700/40 shadow-xl">
+        <div class="flex items-center gap-2 mb-4">
+          <h2 class="text-xl font-bold">Portfolio</h2>
+          <span
+            class="px-2 py-0.5 text-xs font-semibold rounded-full bg-yellow-900/40 text-yellow-300 ring-1 ring-yellow-700/40"
+            title="Placeholder values — no portfolio backend is wired up yet."
+          >
+            Demo data
+          </span>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
           <BalanceCard
             label="Total Assets"
@@ -95,6 +95,20 @@
         </div>
       </section>
 
+      <!-- Data warning / error banners -->
+      <p
+        v-if="dataError"
+        class="p-4 bg-red-900/40 border border-red-700 rounded-xl text-red-300"
+      >
+        {{ dataError }}
+      </p>
+      <p
+        v-if="dataWarning"
+        class="p-4 bg-yellow-900/40 border border-yellow-700 rounded-xl text-yellow-300"
+      >
+        {{ dataWarning }}
+      </p>
+
       <!-- Charts -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <div v-for="stock in selectedStocks" :key="stock" class="space-y-10">
@@ -132,8 +146,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { updateCharts } from '@/chartManager.js'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { updateCharts, destroyAllCharts } from '@/chartManager.js'
 import BalanceCard from '@/components/BalanceCard.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 
@@ -141,6 +155,19 @@ import ProgressBar from '@/components/ProgressBar.vue'
 const selectedCategory = ref('us-stocks')
 const selectedGraph    = ref('line')
 const selectedStocks   = ref(['AAPL'])
+const dataWarning      = ref('')
+const dataError        = ref('')
+
+/* Redraw + surface any data warning/error (synthetic fallback etc.) */
+async function redraw() {
+  const { warning, error } = await updateCharts(
+    selectedStocks.value,
+    selectedCategory.value,
+    selectedGraph.value
+  )
+  dataWarning.value = warning ?? ''
+  dataError.value = error ?? ''
+}
 
 /* ── static lists ────────────────────────────────*/
 const stockLists = {
@@ -182,23 +209,19 @@ watch(
     c: selectedCategory.value,
     s: [...selectedStocks.value]
   }),
-  ({ g, c, s }) => updateCharts(s, c, g),
+  () => redraw(),
   { flush: 'post' }
 )
 
 /* ── initial draw ───────────────────────────────*/
 onMounted(() => {
-  updateCharts(selectedStocks.value, selectedCategory.value, selectedGraph.value)
+  redraw()
 })
 
-/* ── sidebar menu items ─────────────────────────*/
-const menuItems = ref([
-  { name: 'Dashboard' },
-  { name: 'Trade' },
-  { name: 'Settings' },
-  { name: 'About' },
-  { name: 'Login' }
-])
+/* ── cleanup chart instances on unmount ─────────*/
+onBeforeUnmount(() => {
+  destroyAllCharts()
+})
 </script>
 
 <style scoped>

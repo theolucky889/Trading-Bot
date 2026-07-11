@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import concurrent.futures
+import time
 from dataclasses import dataclass, asdict
+from datetime import datetime, timezone
 from typing import List, Literal, Optional, Tuple
 from urllib.parse import quote_plus
 
@@ -13,6 +16,13 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 Label = Literal["positive", "neutral", "negative"]
 
 _analyzer = SentimentIntensityAnalyzer()
+
+# Concurrency + latency budget for article page fetches (M6).
+# Article pages are fetched in parallel; once the budget elapses, any article
+# whose page has not returned falls back to title-only scoring so overall
+# latency stays bounded (~<=8s for 10 articles).
+_FETCH_MAX_WORKERS = 8
+_FETCH_TIME_BUDGET = 10.0  # seconds, overall wall-clock cap for excerpt fetches
 
 
 @dataclass
@@ -85,20 +95,56 @@ def analyze_sentiment_vader(text: str) -> Tuple[float, Label]:
     return compound, _label_from_compound(compound)
 
 
+def _fetch_excerpts(entries: List[dict]) -> dict:
+    """Fetch article page excerpts concurrently within an overall time budget.
+
+    Returns a mapping of article index -> excerpt (or None). Articles whose page
+    has not returned before the budget elapses are left out (None), so callers
+    fall back to title-only scoring. This bounds total latency regardless of how
+    many articles or how slow individual pages are (M6).
+    """
+    excerpts: dict = {}
+    links = {i: (e.get("link") or "") for i, e in enumerate(entries)}
+    to_fetch = {i: link for i, link in links.items() if link}
+    if not to_fetch:
+        return excerpts
+
+    deadline = time.monotonic() + _FETCH_TIME_BUDGET
+    with concurrent.futures.ThreadPoolExecutor(max_workers=_FETCH_MAX_WORKERS) as pool:
+        future_to_idx = {
+            pool.submit(_extract_text_excerpt, link): i for i, link in to_fetch.items()
+        }
+        for future in concurrent.futures.as_completed(future_to_idx):
+            idx = future_to_idx[future]
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+            try:
+                excerpts[idx] = future.result(timeout=remaining)
+            except Exception:
+                # Timeout or fetch error -> fall back to title-only for this one.
+                excerpts[idx] = None
+    return excerpts
+
+
 def analyze_market_sentiment(query: str, num_articles: int = 10, model: str = "vader") -> dict:
     # Currently, we ship VADER by default. If user requests finbert but it's not installed,
     # we fall back to VADER.
-    model_used = model
-    if model.lower() != "vader":
-        model_used = "vader"
+    fell_back = model.lower() != "vader"
+    model_used = "vader" if fell_back else model
 
     entries = fetch_google_news_rss(query, num_articles=num_articles)
-    articles: List[ArticleSentiment] = []
 
-    for e in entries:
+    # Fetch article page excerpts concurrently with an overall time budget so
+    # total latency stays bounded; any article not fetched in time is scored on
+    # its title alone (M6).
+    excerpts = _fetch_excerpts(entries)
+
+    articles: List[ArticleSentiment] = []
+    for i, e in enumerate(entries):
         title = e.get("title") or ""
         link = e.get("link") or ""
-        excerpt = _extract_text_excerpt(link) if link else None
+        excerpt = excerpts.get(i)
 
         # Use excerpt if available; otherwise analyze title only.
         text_for_sentiment = (excerpt or "") + " " + title
@@ -124,12 +170,14 @@ def analyze_market_sentiment(query: str, num_articles: int = 10, model: str = "v
     payload = {
         "query": query,
         "model": model_used,
-        "generated_at": __import__("datetime").datetime.utcnow().isoformat() + "Z",
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f") + "Z",
         "summary": {"positive": pos, "neutral": neu, "negative": neg, "avg_compound": avg},
         "articles": [asdict(a) for a in articles],
     }
-    if model.lower() == "finbert":
-        payload["warning"] = "finbert not installed; fell back to vader"
+    # Always surface a warning when a non-VADER model was requested but we served
+    # VADER (L11): the frontend must know the verdict is not from the requested model.
+    if fell_back:
+        payload["warning"] = f"{model} not available; fell back to vader"
     return payload
 
 def analyze(query: str, num_articles: int = 10, model: str = "vader") -> dict:
